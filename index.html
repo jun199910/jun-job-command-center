@@ -1,131 +1,14 @@
 <!doctype html>
-<html lang="ko">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JUN Job Command Center V2</title>
-<style>
-:root{--bg:#0b1020;--panel:#121a2e;--muted:#8fa0bf;--text:#eef3ff;--line:#26324d;--accent:#6ea8fe;--good:#53d39b;--warn:#ffd166;--bad:#ff6b6b}
-*{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;background:var(--bg);color:var(--text)}
-header{position:sticky;top:0;z-index:5;background:#0b1020e8;backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:16px 22px}
-h1{font-size:20px;margin:0} .sub{color:var(--muted);font-size:13px;margin-top:4px}
-main{max-width:1280px;margin:auto;padding:22px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
-.metric{font-size:28px;font-weight:800}.label{color:var(--muted);font-size:12px}.section{margin-top:18px}.section h2{font-size:17px;margin:0 0 10px}
-.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}button,input,select,textarea{background:#0e1629;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px 10px}
-button{cursor:pointer}.primary{background:var(--accent);color:#08101f;border:0;font-weight:700}.good{color:var(--good)}.warn{color:var(--warn)}.bad{color:var(--bad)}
-table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:11px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:var(--muted);font-weight:600}
-.tag{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 7px;font-size:11px;margin:2px}.cols{display:grid;grid-template-columns:2fr 1fr;gap:12px}
-.todo{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}a{color:#9fc3ff}
-dialog{width:min(760px,94vw);background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:16px;padding:18px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.full{grid-column:1/-1}
-footer{color:var(--muted);font-size:12px;padding:28px 0}.sync{float:right;font-size:12px}
-@media(max-width:850px){.grid{grid-template-columns:1fr 1fr}.cols{grid-template-columns:1fr}.formgrid{grid-template-columns:1fr}.full{grid-column:auto}table{display:block;overflow:auto}}
-</style>
-</head>
-<body>
-<header><h1>JUN JOB COMMAND CENTER <span style="color:#6ea8fe">V2</span></h1>
-<div class="sub">전기계열 첫 취업 · 기준역 연신내 · 목표: 지원처 확정 → 자소서 → 지원</div>
-<div class="sync" id="syncState">로컬 저장 모드</div></header>
-<main>
-<section class="grid">
-<div class="card"><div class="label">전체 후보</div><div class="metric" id="mAll">0</div></div>
-<div class="card"><div class="label">검증 완료</div><div class="metric good" id="mVerified">0</div></div>
-<div class="card"><div class="label">지원 예정/완료</div><div class="metric" id="mApply">0</div></div>
-<div class="card"><div class="label">면접</div><div class="metric warn" id="mInterview">0</div></div>
-</section>
-
-<section class="section cols">
-<div class="card"><h2>오늘 할 일</h2><div id="todos"></div>
-<div class="toolbar" style="margin-top:10px"><input id="todoText" placeholder="할 일 추가"><button onclick="addTodo()">추가</button></div></div>
-<div class="card"><h2>운영 원칙</h2>
-<div class="label">1차 취업 컨설턴트 → 2차 오류검증 → 최종 판단</div>
-<p style="font-size:13px;line-height:1.65">전기기사 <b>필수</b> 공고는 현재 원칙적 제외. 신입 가능, 연신내 통근, 경력가치, 회사 건전성, 워라밸 위험을 함께 본다. 확인할 수 없는 정보는 “문제 없음”이 아니라 <b>미확인</b>으로 남긴다.</p></div>
-</section>
-
-<section class="section card">
-<h2>지원 후보 / 파이프라인</h2>
-<div class="toolbar">
-<button class="primary" onclick="openCompany()">+ 회사 추가</button>
-<input id="q" placeholder="회사·직무 검색" oninput="render()">
-<select id="filterStatus" onchange="render()"><option value="">상태 전체</option><option>발굴</option><option>검증중</option><option>지원예정</option><option>지원완료</option><option>서류합격</option><option>면접</option><option>제외</option></select>
-<select id="filterVerify" onchange="render()"><option value="">검증 전체</option><option>미검증</option><option>1차검증</option><option>교차검증</option></select>
-<button onclick="exportData()">백업 JSON</button><button onclick="document.getElementById('importFile').click()">백업 복원</button>
-<input type="file" id="importFile" hidden accept=".json" onchange="importData(event)">
-</div>
-<div style="overflow:auto"><table><thead><tr><th>등급</th><th>회사 / 직무</th><th>기사</th><th>근무지·통근</th><th>상태</th><th>검증</th><th>마감</th><th>다음 행동</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
-</section>
-
-<section class="section cols">
-<div class="card"><h2>검증센터</h2><div id="verification"></div></div>
-<div class="card"><h2>최근 결정 기록</h2><div id="decisions"></div></div>
-</section>
-<footer>V2 Prototype · 데이터는 현재 이 브라우저에 저장됩니다. 서버 동기화 API를 연결하면 동일 URL 새로고침 방식으로 전환할 수 있습니다.</footer>
-</main>
-
-<dialog id="companyDialog"><form method="dialog" onsubmit="saveCompany(event)">
-<h2 id="dlgTitle">회사</h2><div class="formgrid">
-<input id="cName" placeholder="회사명" required><input id="cRole" placeholder="직무" required>
-<input id="cUrl" class="full" placeholder="공고 URL">
-<select id="cGrade"><option>A</option><option>A-</option><option>B+</option><option>B</option><option>C</option><option>보류</option></select>
-<select id="cLicense"><option>필수 아님</option><option>우대</option><option>필수</option><option>미확인</option></select>
-<input id="cPlace" placeholder="근무지"><input id="cCommute" placeholder="통근 메모">
-<select id="cStatus"><option>발굴</option><option>검증중</option><option>지원예정</option><option>지원완료</option><option>서류합격</option><option>면접</option><option>제외</option></select>
-<select id="cVerify"><option>미검증</option><option>1차검증</option><option>교차검증</option></select>
-<input id="cDeadline" type="date"><input id="cNext" placeholder="다음 행동">
-<textarea id="cRisk" class="full" placeholder="위험요소 / 미확인 정보"></textarea>
-<textarea id="cSources" class="full" placeholder="검증 출처 / 메모"></textarea>
-</div><div class="toolbar" style="justify-content:flex-end;margin-top:14px"><button value="cancel">취소</button><button class="primary" value="default">저장</button></div>
-</form></dialog>
-
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JUN Job Command Center V3</title>
+<style>:root{--bg:#0b1020;--panel:#121a2e;--muted:#8fa0bf;--text:#eef3ff;--line:#26324d;--accent:#6ea8fe;--good:#53d39b;--warn:#ffd166}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;background:var(--bg);color:var(--text)}header{padding:16px 22px;border-bottom:1px solid var(--line)}h1{margin:0;font-size:20px}.sub,.label{color:var(--muted);font-size:12px}main{max-width:1280px;margin:auto;padding:22px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}.metric{font-size:28px;font-weight:800}.section{margin-top:18px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}button,input,select{background:#0e1629;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px}.primary{background:var(--accent);color:#08101f;border:0;font-weight:700}.good{color:var(--good)}.warn{color:var(--warn)}table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:11px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:var(--muted)}a{color:#9fc3ff}.pill{border:1px solid var(--line);border-radius:999px;padding:3px 7px}@media(max-width:850px){.grid{grid-template-columns:1fr 1fr}table{display:block;overflow:auto}}</style></head>
+<body><header><h1>JUN JOB COMMAND CENTER <span style="color:#6ea8fe">V3</span></h1><div class="sub">전기계열 첫 취업 · 기준역 연신내 · Supabase DB 연동</div><div id="sync" class="label">DB 연결 중…</div></header><main>
+<section class="grid"><div class="card"><div class="label">전체 후보</div><div class="metric" id="all">0</div></div><div class="card"><div class="label">추천 70점+</div><div class="metric good" id="good">0</div></div><div class="card"><div class="label">지원 예정/완료</div><div class="metric" id="apply">0</div></div><div class="card"><div class="label">면접</div><div class="metric warn" id="interview">0</div></div></section>
+<section class="section card"><h2>지원 후보 / 파이프라인</h2><div class="toolbar"><input id="q" placeholder="회사·직무 검색"><select id="fs"><option value="">상태 전체</option><option>발굴</option><option>검증중</option><option>지원예정</option><option>지원완료</option><option>서류합격</option><option>면접</option><option>제외</option></select><button class="primary" id="refresh">DB 새로고침</button></div><div style="overflow:auto"><table><thead><tr><th>점수</th><th>회사 / 직무</th><th>기사</th><th>근무지·통근</th><th>신입</th><th>경력가치</th><th>상태</th><th>메모</th></tr></thead><tbody id="rows"></tbody></table></div></section>
+<section class="section card"><h2>운영 원칙</h2><p class="label" style="font-size:13px;line-height:1.7">전기기사 필수 공고는 현재 원칙적 제외. 신입 가능 여부, 연신내 기준 통근 시간뿐 아니라 환승·도보 부담, 경력가치, 회사 건전성, 워라밸 위험을 함께 검증한다. 확인할 수 없는 정보는 ‘문제 없음’이 아니라 ‘미확인’으로 남긴다.</p></section></main>
 <script>
-const KEY="jun-job-v2";
-const seed={
-companies:[
-{id:1,grade:"A",name:"에피텍",role:"DTS 시스템 Project Manager 신입",url:"",license:"필수 아님",place:"서울 영등포",commute:"연신내 기준 비교적 양호",status:"검증중",verify:"1차검증",deadline:"",next:"출장 빈도·후기 재검증",risk:"외근 약 50%, 국내외 출장 가능성 확인 필요",sources:"초기 대화에서 발굴. 원공고 재검증 필요"},
-{id:2,grade:"A-",name:"하이멕",role:"전기계통/건축환경설비 연구·해석",url:"",license:"필수 아님",place:"서울 영등포",commute:"양평역 인근, 통근 양호",status:"검증중",verify:"1차검증",deadline:"",next:"평판·자격요건 최종 확인",risk:"상향지원. E-TAP 등 우대조건",sources:"초기 대화에서 발굴. 원공고 재검증 필요"},
-{id:3,grade:"B+",name:"인투알",role:"ESS 전기·전장설계",url:"",license:"필수 아님",place:"인천 청라",commute:"통근 부담 큼",status:"검증중",verify:"1차검증",deadline:"",next:"AutoCAD 필수조건 확인",risk:"신입 AutoCAD 사용 가능 필수. 시운전/출장 비중 확인",sources:"초기 대화에서 발굴. 원공고 재검증 필요"},
-{id:4,grade:"보류",name:"라이팩",role:"전기전자계열 신입",url:"",license:"필수 아님",place:"서울 영등포",commute:"통근 양호",status:"발굴",verify:"미검증",deadline:"",next:"세부 직무 확인",risk:"구체적 직무가 불명확",sources:"초기 대화에서 발굴"},
-{id:5,grade:"C",name:"인터전기",role:"자동제어/PLC",url:"",license:"미확인",place:"",commute:"",status:"제외",verify:"교차검증",deadline:"",next:"재추천 금지",risk:"면접후기에서 장시간 근무·주말근무·헌신 강조 관련 강한 경고신호",sources:"사람인 면접후기 및 공개 평판을 대화에서 검토"}
-],
-todos:[
-{id:1,text:"지원 후보 8~12곳까지 확장",done:false},
-{id:2,text:"에피텍·하이멕 2차 검증",done:false},
-{id:3,text:"지원처 확정 후 기본 자소서 작성",done:false},
-{id:4,text:"수요일 첫 원서 제출",done:false}
-],
-decisions:[
-{at:"2026-09-28",text:"연신내역을 통근 기준점으로 사용"},
-{at:"2026-09-28",text:"전기기사 필수 공고는 현재 원칙적 제외"},
-{at:"2026-09-28",text:"단순 A/S·설치보다 경력 확장성이 있는 전기 직무 우선"},
-{at:"2026-09-28",text:"인터전기는 근무문화 위험신호로 제외"}
-]};
-let data=JSON.parse(localStorage.getItem(KEY)||"null")||seed, editing=null;
-function persist(){localStorage.setItem(KEY,JSON.stringify(data));render()}
-function render(){
- const q=document.getElementById("q").value.toLowerCase(), fs=document.getElementById("filterStatus").value, fv=document.getElementById("filterVerify").value;
- const list=data.companies.filter(c=>(!q||(c.name+" "+c.role).toLowerCase().includes(q))&&(!fs||c.status===fs)&&(!fv||c.verify===fv));
- document.getElementById("rows").innerHTML=list.map(c=>`<tr><td><b>${c.grade}</b></td><td>${c.url?`<a href="${c.url}" target="_blank">${c.name}</a>`:c.name}<br><span class="label">${c.role}</span></td><td>${c.license}</td><td>${c.place}<br><span class="label">${c.commute}</span></td><td>${c.status}</td><td class="${c.verify==="교차검증"?"good":c.verify==="미검증"?"bad":"warn"}">${c.verify}</td><td>${c.deadline||"-"}</td><td>${c.next||"-"}</td><td><button onclick="openCompany(${c.id})">편집</button></td></tr>`).join("");
- document.getElementById("mAll").textContent=data.companies.filter(c=>c.status!=="제외").length;
- document.getElementById("mVerified").textContent=data.companies.filter(c=>c.verify==="교차검증"&&c.status!=="제외").length;
- document.getElementById("mApply").textContent=data.companies.filter(c=>["지원예정","지원완료"].includes(c.status)).length;
- document.getElementById("mInterview").textContent=data.companies.filter(c=>["서류합격","면접"].includes(c.status)).length;
- document.getElementById("todos").innerHTML=data.todos.map(t=>`<div class="todo"><input type="checkbox" ${t.done?"checked":""} onchange="toggleTodo(${t.id})"><span style="${t.done?"text-decoration:line-through;color:#8fa0bf":""}">${t.text}</span></div>`).join("");
- document.getElementById("verification").innerHTML=data.companies.filter(c=>c.status!=="제외"&&c.verify!=="교차검증").slice(0,6).map(c=>`<p><b>${c.name}</b> <span class="tag">${c.verify}</span><br><span class="label">${c.risk||"위험요소 미입력"}</span></p>`).join("")||"<span class=label>검증 대기 없음</span>";
- document.getElementById("decisions").innerHTML=data.decisions.slice(-6).reverse().map(d=>`<p><span class="label">${d.at}</span><br>${d.text}</p>`).join("");
-}
-function addTodo(){let e=document.getElementById("todoText");if(!e.value.trim())return;data.todos.push({id:Date.now(),text:e.value.trim(),done:false});e.value="";persist()}
-function toggleTodo(id){let t=data.todos.find(x=>x.id===id);t.done=!t.done;persist()}
-function openCompany(id){
- editing=id||null; let c=id?data.companies.find(x=>x.id===id):{grade:"B",license:"미확인",status:"발굴",verify:"미검증"};
- for(const [el,k] of [["cName","name"],["cRole","role"],["cUrl","url"],["cGrade","grade"],["cLicense","license"],["cPlace","place"],["cCommute","commute"],["cStatus","status"],["cVerify","verify"],["cDeadline","deadline"],["cNext","next"],["cRisk","risk"],["cSources","sources"]]) document.getElementById(el).value=c[k]||"";
- document.getElementById("dlgTitle").textContent=id?"회사 편집":"회사 추가";document.getElementById("companyDialog").showModal()
-}
-function saveCompany(e){
- e.preventDefault(); const g=id=>document.getElementById(id).value;
- const c={id:editing||Date.now(),name:g("cName"),role:g("cRole"),url:g("cUrl"),grade:g("cGrade"),license:g("cLicense"),place:g("cPlace"),commute:g("cCommute"),status:g("cStatus"),verify:g("cVerify"),deadline:g("cDeadline"),next:g("cNext"),risk:g("cRisk"),sources:g("cSources")};
- if(editing){data.companies[data.companies.findIndex(x=>x.id===editing)]=c}else data.companies.push(c);
- data.decisions.push({at:new Date().toISOString().slice(0,10),text:`${c.name}: ${c.status} / ${c.verify}로 업데이트`});
- document.getElementById("companyDialog").close();persist()
-}
-function exportData(){let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="jun-job-backup.json";a.click()}
-function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);persist()}catch{alert("올바른 백업 파일이 아닙니다.")}};r.readAsText(f)}
-render();
+const API='https://iifuvchvjhzursffvvzk.supabase.co/rest/v1/companies?select=*&order=recommendation_score.desc.nullslast',KEY='sb_publishable_HUif7UBTbshBV-SdR0oSYA_b1GC0iM0';let data=[];
+const E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function load(){sync.textContent='DB 동기화 중…';try{let r=await fetch(API,{headers:{apikey:KEY}});if(!r.ok)throw Error(r.status);data=await r.json();sync.textContent='● Supabase DB 연결됨 · '+new Date().toLocaleTimeString('ko-KR');render()}catch(e){sync.textContent='DB 연결 오류: '+e.message}}
+function render(){let x=q.value.toLowerCase(),s=fs.value,l=data.filter(c=>(!x||(String(c.company_name)+' '+String(c.job_title)).toLowerCase().includes(x))&&(!s||c.status===s));rows.innerHTML=l.map(c=>`<tr><td><b>${E(c.recommendation_score??'-')}</b></td><td>${c.job_url?`<a href="${E(c.job_url)}" target="_blank">${E(c.company_name)}</a>`:E(c.company_name)}<br><span class="label">${E(c.job_title)}</span></td><td>${E(c.license_requirement)}</td><td>${E(c.location)}<br><span class="label">${c.commute_minutes?E(c.commute_minutes)+'분 · ':''}${c.transfers!=null?E(c.transfers)+'회 환승 · ':''}${E(c.commute_grade)}</span></td><td>${c.entry_level_ok===true?'가능':c.entry_level_ok===false?'불가':'미확인'}</td><td>${E(c.career_value)}</td><td><span class="pill">${E(c.status)}</span></td><td>${E(c.notes)}</td></tr>`).join('');all.textContent=data.filter(c=>c.status!=='제외').length;good.textContent=data.filter(c=>c.status!=='제외'&&(c.recommendation_score||0)>=70).length;apply.textContent=data.filter(c=>['지원예정','지원완료'].includes(c.status)).length;interview.textContent=data.filter(c=>['서류합격','면접'].includes(c.status)).length}
+q.oninput=render;fs.onchange=render;refresh.onclick=load;load();setInterval(load,60000);
 </script></body></html>
