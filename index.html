@@ -1,14 +1,115 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JUN Job Command Center V3</title>
-<style>:root{--bg:#0b1020;--panel:#121a2e;--muted:#8fa0bf;--text:#eef3ff;--line:#26324d;--accent:#6ea8fe;--good:#53d39b;--warn:#ffd166}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;background:var(--bg);color:var(--text)}header{padding:16px 22px;border-bottom:1px solid var(--line)}h1{margin:0;font-size:20px}.sub,.label{color:var(--muted);font-size:12px}main{max-width:1280px;margin:auto;padding:22px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}.metric{font-size:28px;font-weight:800}.section{margin-top:18px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}button,input,select{background:#0e1629;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px}.primary{background:var(--accent);color:#08101f;border:0;font-weight:700}.good{color:var(--good)}.warn{color:var(--warn)}table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:11px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:var(--muted)}a{color:#9fc3ff}.pill{border:1px solid var(--line);border-radius:999px;padding:3px 7px}@media(max-width:850px){.grid{grid-template-columns:1fr 1fr}table{display:block;overflow:auto}}</style></head>
-<body><header><h1>JUN JOB COMMAND CENTER <span style="color:#6ea8fe">V3</span></h1><div class="sub">전기계열 첫 취업 · 기준역 연신내 · Supabase DB 연동</div><div id="sync" class="label">DB 연결 중…</div></header><main>
-<section class="grid"><div class="card"><div class="label">전체 후보</div><div class="metric" id="all">0</div></div><div class="card"><div class="label">추천 70점+</div><div class="metric good" id="good">0</div></div><div class="card"><div class="label">지원 예정/완료</div><div class="metric" id="apply">0</div></div><div class="card"><div class="label">면접</div><div class="metric warn" id="interview">0</div></div></section>
-<section class="section card"><h2>지원 후보 / 파이프라인</h2><div class="toolbar"><input id="q" placeholder="회사·직무 검색"><select id="fs"><option value="">상태 전체</option><option>발굴</option><option>검증중</option><option>지원예정</option><option>지원완료</option><option>서류합격</option><option>면접</option><option>제외</option></select><button class="primary" id="refresh">DB 새로고침</button></div><div style="overflow:auto"><table><thead><tr><th>점수</th><th>회사 / 직무</th><th>기사</th><th>근무지·통근</th><th>신입</th><th>경력가치</th><th>상태</th><th>메모</th></tr></thead><tbody id="rows"></tbody></table></div></section>
-<section class="section card"><h2>운영 원칙</h2><p class="label" style="font-size:13px;line-height:1.7">전기기사 필수 공고는 현재 원칙적 제외. 신입 가능 여부, 연신내 기준 통근 시간뿐 아니라 환승·도보 부담, 경력가치, 회사 건전성, 워라밸 위험을 함께 검증한다. 확인할 수 없는 정보는 ‘문제 없음’이 아니라 ‘미확인’으로 남긴다.</p></section></main>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JUN Job Command Center V4</title>
+<style>
+:root{--bg:#09101f;--panel:#111a2e;--panel2:#0d1628;--line:#263653;--text:#edf3ff;--muted:#91a2c2;--blue:#70a9ff;--green:#55d69e;--yellow:#ffd166;--red:#ff7373}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}
+header{position:sticky;top:0;z-index:5;background:#09101ff2;border-bottom:1px solid var(--line);padding:16px 22px}
+h1{margin:0;font-size:20px}.muted{color:var(--muted);font-size:12px}main{max-width:1450px;margin:auto;padding:22px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
+.metric{font-size:29px;font-weight:850;margin-top:4px}.section{margin-top:16px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+input,select,button{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:9px;padding:9px 10px}
+button{cursor:pointer}.primary{background:var(--blue);color:#07101f;border:0;font-weight:800}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:11px 8px;text-align:left;vertical-align:top}th{color:var(--muted);white-space:nowrap}
+a{color:#9fc5ff;text-decoration:none}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 7px;margin:1px}.tier{font-weight:900;font-size:14px}
+.good{color:var(--green)}.warn{color:var(--yellow)}.bad{color:var(--red)}.actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}.actions a{border:1px solid var(--line);padding:4px 7px;border-radius:7px;font-size:11px}
+details{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px}summary{cursor:pointer;color:#c8d8f5}
+.log{padding:10px 0;border-bottom:1px solid var(--line)}.log:last-child{border:0}.legend{line-height:1.8}
+@media(max-width:900px){.metrics{grid-template-columns:1fr 1fr}table{display:block;overflow:auto}}
+</style>
+</head>
+<body>
+<header>
+<h1>JUN JOB COMMAND CENTER <span style="color:var(--blue)">V4</span></h1>
+<div class="muted">취업 컨설턴트 + 독립 검증원 · 기준역 연신내 · Supabase Live DB</div>
+<div id="sync" class="muted">DB 연결 중…</div>
+</header>
+<main>
+<section class="metrics">
+<div class="card"><div class="muted">전체 후보</div><div id="mAll" class="metric">0</div></div>
+<div class="card"><div class="muted">A티어 이상</div><div id="mTop" class="metric good">0</div></div>
+<div class="card"><div class="muted">지원 예정/완료</div><div id="mApply" class="metric">0</div></div>
+<div class="card"><div class="muted">검증 필요</div><div id="mVerify" class="metric warn">0</div></div>
+</section>
+
+<section class="section card">
+<h2>지원 후보 / 의사결정 보드</h2>
+<div class="toolbar">
+<input id="q" placeholder="회사·직무 검색">
+<select id="status"><option value="">상태 전체</option><option>발굴</option><option>검증중</option><option>지원예정</option><option>지원완료</option><option>서류합격</option><option>면접</option><option>제외</option></select>
+<select id="tierFilter"><option value="">티어 전체</option><option>S</option><option>A</option><option>B</option><option>C</option><option>D</option><option>X</option></select>
+<button class="primary" id="refresh">DB 새로고침</button>
+</div>
+<div style="overflow:auto">
+<table><thead><tr><th>점수·티어</th><th>회사 / 직무</th><th>독립 검증</th><th>자격</th><th>통근</th><th>경력가치</th><th>상태</th><th>상세</th></tr></thead><tbody id="rows"></tbody></table>
+</div>
+</section>
+
+<section class="section" style="display:grid;grid-template-columns:2fr 1fr;gap:16px">
+<div class="card"><h2>최근 업데이트</h2><div id="logs"><div class="muted">불러오는 중…</div></div></div>
+<div class="card"><h2>평가 기준</h2><div class="legend muted">
+<b style="color:var(--text)">티어</b><br>S 90–100 · A 80–89 · B 70–79 · C 60–69 · D 0–59 · X 제외<br><br>
+<b style="color:var(--text)">독립 검증원</b><br>컨설턴트의 최초 판단을 그대로 신뢰하지 않고 공고·회사정보·통근·후기 근거를 재검증.<br><br>
+<b style="color:var(--text)">출처 등급</b><br>A 1차/공식자료 · B 주요 채용플랫폼 · C 후기/경험자료 · D 추정/출처불명
+</div></div>
+</section>
+
+<section class="section card"><h2>운영 원칙</h2><div class="muted" style="line-height:1.8">
+전기기사 필수 공고는 현재 원칙적 제외. 신입 가능 여부, 전공 적합성, 실제 통근 부담, 경력가치, 회사 건전성, 워라밸 위험을 함께 본다.
+미확인 정보는 긍정으로 추정하지 않는다. <b>오류 발견</b>과 <b>미확인</b>을 구분하며, 검증 신뢰도는 근거가 확보된 정도를 나타낸다.
+</div></section>
+</main>
+
 <script>
-const API='https://iifuvchvjhzursffvvzk.supabase.co/rest/v1/companies?select=*&order=recommendation_score.desc.nullslast',KEY='sb_publishable_HUif7UBTbshBV-SdR0oSYA_b1GC0iM0';let data=[];
+const BASE='https://iifuvchvjhzursffvvzk.supabase.co/rest/v1/';
+const KEY='sb_publishable_HUif7UBTbshBV-SdR0oSYA_b1GC0iM0';
+let companies=[],activity=[];
+const H={apikey:KEY};
 const E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-async function load(){sync.textContent='DB 동기화 중…';try{let r=await fetch(API,{headers:{apikey:KEY}});if(!r.ok)throw Error(r.status);data=await r.json();sync.textContent='● Supabase DB 연결됨 · '+new Date().toLocaleTimeString('ko-KR');render()}catch(e){sync.textContent='DB 연결 오류: '+e.message}}
-function render(){let x=q.value.toLowerCase(),s=fs.value,l=data.filter(c=>(!x||(String(c.company_name)+' '+String(c.job_title)).toLowerCase().includes(x))&&(!s||c.status===s));rows.innerHTML=l.map(c=>`<tr><td><b>${E(c.recommendation_score??'-')}</b></td><td>${c.job_url?`<a href="${E(c.job_url)}" target="_blank">${E(c.company_name)}</a>`:E(c.company_name)}<br><span class="label">${E(c.job_title)}</span></td><td>${E(c.license_requirement)}</td><td>${E(c.location)}<br><span class="label">${c.commute_minutes?E(c.commute_minutes)+'분 · ':''}${c.transfers!=null?E(c.transfers)+'회 환승 · ':''}${E(c.commute_grade)}</span></td><td>${c.entry_level_ok===true?'가능':c.entry_level_ok===false?'불가':'미확인'}</td><td>${E(c.career_value)}</td><td><span class="pill">${E(c.status)}</span></td><td>${E(c.notes)}</td></tr>`).join('');all.textContent=data.filter(c=>c.status!=='제외').length;good.textContent=data.filter(c=>c.status!=='제외'&&(c.recommendation_score||0)>=70).length;apply.textContent=data.filter(c=>['지원예정','지원완료'].includes(c.status)).length;interview.textContent=data.filter(c=>['서류합격','면접'].includes(c.status)).length}
-q.oninput=render;fs.onchange=render;refresh.onclick=load;load();setInterval(load,60000);
-</script></body></html>
+const tier=c=>c.status==='제외'?'X':c.recommendation_score>=90?'S':c.recommendation_score>=80?'A':c.recommendation_score>=70?'B':c.recommendation_score>=60?'C':'D';
+const vClass=s=>/통과/.test(s||'')?'good':/오류|실패/.test(s||'')?'bad':'warn';
+const date=s=>s?new Date(s).toLocaleDateString('ko-KR'):'미확인';
+
+async function load(){
+ sync.textContent='DB 동기화 중…';
+ try{
+  const [cr,lr]=await Promise.all([
+   fetch(BASE+'companies?select=*&order=recommendation_score.desc.nullslast',{headers:H}),
+   fetch(BASE+'activity_log?select=*&order=created_at.desc&limit=20',{headers:H})
+  ]);
+  if(!cr.ok||!lr.ok)throw Error('HTTP '+cr.status+'/'+lr.status);
+  companies=await cr.json();activity=await lr.json();
+  sync.textContent='● Supabase DB 연결됨 · '+new Date().toLocaleTimeString('ko-KR');
+  render();renderLogs();
+ }catch(e){sync.textContent='DB 연결 오류: '+e.message}
+}
+function render(){
+ const query=q.value.toLowerCase(),st=status.value,tf=tierFilter.value;
+ const list=companies.filter(c=>(!query||(String(c.company_name)+' '+String(c.job_title)).toLowerCase().includes(query))&&(!st||c.status===st)&&(!tf||tier(c)===tf));
+ rows.innerHTML=list.map(c=>{
+  const t=tier(c), conf=c.verification_confidence==null?'--':c.verification_confidence+'%';
+  const verify=c.verification_status||'재검증';
+  const commute=[c.commute_minutes?c.commute_minutes+'분':null,c.transfers!=null?c.transfers+'회 환승':null,c.walk_minutes?`도보 ${c.walk_minutes}분`:null,c.commute_tier?'통근 '+c.commute_tier:c.commute_grade].filter(Boolean).join(' · ');
+  return `<tr>
+   <td><span class="tier">${E(c.recommendation_score??'-')} (${t})</span></td>
+   <td><b>${E(c.company_name)}</b><br><span class="muted">${E(c.job_title)}</span><div class="actions">${c.job_url?`<a href="${E(c.job_url)}" target="_blank">공고 보기</a>`:''}${c.map_url?`<a href="${E(c.map_url)}" target="_blank">지도</a>`:''}${c.route_url?`<a href="${E(c.route_url)}" target="_blank">길찾기</a>`:''}</div></td>
+   <td><span class="${vClass(verify)}">${E(verify)}</span><br><span class="muted">신뢰도 ${conf} · 출처 ${E(c.source_grade||'-')}</span><br><span class="muted">검증 ${date(c.last_verified_at)}</span></td>
+   <td>기사: ${E(c.license_requirement)}<br><span class="muted">신입: ${c.entry_level_ok===true?'가능':c.entry_level_ok===false?'불가':'미확인'}</span></td>
+   <td>${E(c.location)}<br><span class="muted">${E(commute||'미확인')}</span><br><span class="muted">${E(c.nearest_station||'')}</span></td>
+   <td>${E(c.career_value||'미확인')}</td>
+   <td><span class="pill">${E(c.status)}</span></td>
+   <td><details><summary>보기</summary><div class="muted" style="margin-top:8px;line-height:1.65"><b>컨설턴트 메모</b><br>${E(c.notes||'없음')}<br><br><b>검증원 메모</b><br>${E(c.verification_notes||'아직 독립 검증 전')}<br><br><b>통근 상세</b><br>${E(c.commute_detail||'미확인')}</div></details></td>
+  </tr>`}).join('');
+ mAll.textContent=companies.filter(c=>c.status!=='제외').length;
+ mTop.textContent=companies.filter(c=>c.status!=='제외'&&['S','A'].includes(tier(c))).length;
+ mApply.textContent=companies.filter(c=>['지원예정','지원완료'].includes(c.status)).length;
+ mVerify.textContent=companies.filter(c=>!['통과','검증완료'].includes(c.verification_status||'')).length;
+}
+function renderLogs(){
+ logs.innerHTML=activity.length?activity.map(x=>`<div class="log"><b>${E(x.action)}</b><div class="muted">${new Date(x.created_at).toLocaleString('ko-KR')} · ${E(x.detail||'')}</div></div>`).join(''):'<div class="muted">아직 업데이트 기록이 없습니다.</div>';
+}
+q.oninput=render;status.onchange=render;tierFilter.onchange=render;refresh.onclick=load;load();setInterval(load,60000);
+</script>
+</body></html>
