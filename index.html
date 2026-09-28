@@ -4,18 +4,20 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>JUN Job Command Center V4</title>
 <style>
-:root{--bg:#f6f8fb;--panel:#ffffff;--panel2:#f7f9fc;--line:#dce3ee;--text:#172033;--muted:#64748b;--blue:#2563eb;--green:#059669;--yellow:#b7791f;--red:#dc2626}
+:root{color-scheme:light;--bg:#e9eef1;--panel:#f6f7f4;--panel2:#edf1f2;--line:#d4dde0;--text:#2e4050;--muted:#566977;--blue:#38628b;--green:#326c59;--yellow:#856323;--red:#a34d4d;--header:#f2f5f2ee;--on-blue:#f6f7f4}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}
-header{position:sticky;top:0;z-index:5;background:#ffffffee;border-bottom:1px solid var(--line);padding:16px 22px;backdrop-filter:blur(8px)}
+header{position:sticky;top:0;z-index:5;background:var(--header);border-bottom:1px solid var(--line);padding:16px 22px;backdrop-filter:blur(8px)}
 h1{margin:0;font-size:20px}.muted{color:var(--muted);font-size:12px}main{max-width:1450px;margin:auto;padding:22px}
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(46,64,80,.035)}
 .metric{font-size:29px;font-weight:850;margin-top:4px}.section{margin-top:16px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
 input,select,button{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:9px;padding:9px 10px}
-button{cursor:pointer}.primary{background:var(--blue);color:#fff;border:0;font-weight:800}
+button{cursor:pointer}.primary{background:var(--blue);color:var(--on-blue);border:0;font-weight:800}
+input::placeholder{color:var(--muted);opacity:1}
+input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
 table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:11px 8px;text-align:left;vertical-align:top}th{color:var(--muted);white-space:nowrap}
-a{color:#1d4ed8;text-decoration:none}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 7px;margin:1px;background:#fff}.tier{font-weight:900;font-size:14px}
-.good{color:var(--green)}.warn{color:var(--yellow)}.bad{color:var(--red)}.actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}.actions a{border:1px solid var(--line);padding:4px 7px;border-radius:7px;font-size:11px;background:#fff}
-details{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px}summary{cursor:pointer;color:#334155}
+a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 7px;margin:1px;background:var(--panel2)}.tier{font-weight:900;font-size:14px}
+.good{color:var(--green)}.warn{color:var(--yellow)}.bad{color:var(--red)}.actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}.actions a{border:1px solid var(--line);padding:4px 7px;border-radius:7px;font-size:11px;background:var(--panel2)}
+details{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px}summary{cursor:pointer;color:var(--text)}
 .log{padding:10px 0;border-bottom:1px solid var(--line)}.log:last-child{border:0}.legend{line-height:1.8}
 @media(max-width:900px){.metrics{grid-template-columns:1fr 1fr}table{display:block;overflow:auto}}
 </style>
