@@ -4,6 +4,22 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const source = fs.readFileSync(require('node:path').join(__dirname, '../index.html'), 'utf8');
 const script = source.match(/<script>([\s\S]*?)<\/script>/)[1];
+test('70-point boundary follows visible results and appears once before 69, not 70',async()=>{
+  const data=[80,70,69,60,null].map((score,id)=>({id,company_name:'회사'+id,job_title:'직무',recommendation_score:score,status:'신규후보'}));
+  const a=app(data);await a.run('load()');
+  const html=()=>a.elements.rows.innerHTML;
+  const count=()=> (html().match(/class="score-boundary"/g)||[]).length;
+  assert.equal(count(),1);
+  assert.ok(html().indexOf('70 (B)')<html().indexOf('class="score-boundary"'));
+  assert.ok(html().indexOf('class="score-boundary"')<html().indexOf('69 (C)'));
+  a.elements.tierFilter.value='B';a.run('render()');assert.equal(count(),0);
+  a.elements.tierFilter.value='C';a.run('render()');assert.equal(count(),0);
+  a.elements.tierFilter.value='';a.elements.q.value='회사2';a.run('render()');assert.equal(count(),0);
+  a.elements.q.value='일치없음';a.run('render()');assert.equal(count(),0);
+  a.elements.q.value='';a.run('render()');assert.equal(count(),1);
+  const missing=app([{id:1,recommendation_score:80},{id:2,recommendation_score:null}]);await missing.run('load()');
+  assert.ok(!missing.elements.rows.innerHTML.includes('class="score-boundary"'));
+});
 function app(data = []) {
   const elements = Object.fromEntries(['q','status','tierFilter','refresh','rows','sync','logs','mAll','mTop','mApply','mVerify'].map(id => [id, { value:'', textContent:'', innerHTML:'', querySelectorAll:()=>[] }]));
   const calls = [];

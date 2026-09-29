@@ -24,6 +24,7 @@ table{table-layout:fixed;min-width:1050px}td{overflow-wrap:anywhere}th:nth-child
 .career-preview{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;white-space:normal;overflow:hidden;line-height:1.5;max-height:3em;margin-top:5px}.view-button{white-space:nowrap;padding:7px;font-size:14px}.summary-row>td{padding:12px;background:var(--panel2)}
 .summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.summary-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px;font-size:14px;line-height:1.65;min-width:0}.summary-card h3{font-size:14px;margin:0 0 7px;color:var(--blue)}.summary-card p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}.summary-title{margin:0 0 10px;font-size:16px}
 .analysis{margin-top:12px}.analysis>summary{display:inline-block;border:1px solid var(--line);border-radius:8px;padding:8px 12px;background:var(--panel);font-weight:700}.analysis>summary::before{content:'▶ ';font-size:12px}.analysis[open]>summary::before{content:'▼ '}.analysis-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}.analysis-section{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}.analysis-section h4{margin:0 0 10px;font-size:15px}.analysis-section dl{margin:0;font-size:14px;line-height:1.65}.analysis-section dt{color:var(--muted);margin-top:10px}.analysis-section dd{margin:3px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}.summary-row[hidden]{display:none}
+.score-boundary>td{border-top:4px solid var(--blue)}
 @media(max-width:900px){.summary-grid,.analysis-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:900px){.metrics{grid-template-columns:1fr 1fr}table{display:block;overflow:auto}}
 </style>
@@ -147,11 +148,12 @@ async function load(){
 function render(){
  const query=q.value.toLowerCase(),st=statusFilter.value,tf=tierFilter.value;
  const list=companies.filter(c=>(!query||(String(c.company_name)+' '+String(c.job_title)).toLowerCase().includes(query))&&(!st||c.status===st)&&(!tf||tier(c)===tf));
- rows.innerHTML=list.map(c=>{
+ const boundary=list.some(c=>c.recommendation_score!=null&&c.recommendation_score>=70)?list.findIndex(c=>c.recommendation_score!=null&&c.recommendation_score<70):-1;
+ rows.innerHTML=list.map((c,index)=>{
   const t=tier(c), conf=c.verification_confidence==null?'--':c.verification_confidence+'%';
   const verify=c.verification_status||'재검증';
   const commute=commuteText(c),key=String(c.id),panel='company-summary-'+key;
-  return `<tr>
+  return `<tr${index===boundary?' class="score-boundary"':''}>
    <td><span class="tier">${E(c.recommendation_score??'-')} (${t})</span></td>
    <td><b>${E(c.company_name)}</b><br><span class="muted">${E(c.job_title)}</span><div class="tags">${companyTags(c).map(x=>`<span class="tag ${x.warn?'warn':''}" title="${E(x.evidence)}">${E(x.label)}</span>`).join('')}</div><div class="actions">${c.job_url?`<a href="${E(c.job_url)}" target="_blank" rel="noopener noreferrer">공고 보기</a>`:''}${c.map_url?`<a href="${E(c.map_url)}" target="_blank" rel="noopener noreferrer">지도</a>`:''}${c.route_url?`<a href="${E(c.route_url)}" target="_blank" rel="noopener noreferrer">길찾기</a>`:''}</div></td>
    <td><span class="${vClass(verify)}">${E(verify)}</span><br><span class="muted">신뢰도 ${conf} · 출처 ${E(c.source_grade||'-')}</span><br><span class="muted">검증 ${date(c.last_verified_at)}</span></td>
