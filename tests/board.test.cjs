@@ -4,6 +4,16 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const source = fs.readFileSync(require('node:path').join(__dirname, '../index.html'), 'utf8');
 const script = source.match(/<script>([\s\S]*?)<\/script>/)[1];
+test('independent status details are escaped and closed jobs remain accessible in archive filter',async()=>{
+ const a=app([{id:1,company_name:'닫힌회사',status:'마감',verification_status:'마감확인'},{id:2,company_name:'대기회사',status:'신규후보',verification_status:'독립검증 대기',independent_verification:{status:'독립검증 대기',job_url:'https://example.com/job',summary:'<script>bad</script>',conflicts:[{field:'entry_level',evidence:'경력 필수'}]}}]);
+ await a.run('load()');
+ assert.ok(!a.elements.rows.innerHTML.includes('닫힌회사'));
+ assert.ok(a.elements.rows.innerHTML.includes('◷ 독립검증 대기'));
+ assert.ok(a.elements.rows.innerHTML.includes('1차 보고서 확정'));
+ assert.ok(a.elements.rows.innerHTML.includes('&lt;script&gt;bad'));
+ assert.ok(a.elements.rows.innerHTML.includes('신입/경력: 경력 필수'));
+ a.elements.status.value='마감';a.run('render()');assert.ok(a.elements.rows.innerHTML.includes('닫힌회사'));
+});
 test('70-point boundary follows visible results and appears once before 69, not 70',async()=>{
   const data=[80,70,69,60,null].map((score,id)=>({id,company_name:'회사'+id,job_title:'직무',recommendation_score:score,status:'신규후보'}));
   const a=app(data);await a.run('load()');

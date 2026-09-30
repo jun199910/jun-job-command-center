@@ -1,0 +1,56 @@
+-- Execute as database owner. All test rows/credentials are rolled back.
+begin;
+do $$
+declare cid bigint; qid bigint; n integer; job jsonb; sealed jsonb; r jsonb; checks jsonb; answer jsonb; mode text; denied boolean;
+begin
+ insert into verification_private.worker_credentials values('rollback-test',encode(extensions.digest('rollback-test-token','sha256'),'hex'),true);
+ insert into public.companies(company_name,job_title,job_url,status,recommendation_score) values('PIPELINE ROLLBACK TEST','개발','https://example.invalid/job/1','신규후보',80) returning id into cid;
+ select count(*) into n from public.independent_verification_queue where company_id=cid;
+ assert n=1,'new posting must enqueue';
+ update public.companies set job_url=job_url,recommendation_score=81,notes='memo',commute_minutes=30 where id=cid;
+ select count(*) into n from public.independent_verification_queue where company_id=cid;
+ assert n=1,'same URL/score/memo/commute must not enqueue';
+ update public.companies set job_url='https://example.invalid/job/2' where id=cid;
+ select count(*) into n from public.independent_verification_queue where company_id=cid;
+ assert n=2,'new URL must enqueue';
+ update public.companies set posting_source_facts='{"required_skills":["PLC"]}' where id=cid;
+ update public.companies set posting_source_facts='{"required_skills":["PLC"]}' where id=cid;
+ select count(*) into n from public.independent_verification_queue where company_id=cid;
+ assert n=3,'material content change once';
+ update public.companies set posting_source_facts=null where id=cid;
+ select count(*) into n from public.independent_verification_queue where company_id=cid;
+ assert n=3,'returning to same content deduplicated';
+ denied:=false;
+ begin perform public.verification_worker('claim','{}','wrong-token'); exception when insufficient_privilege then denied:=true; end;
+ assert denied,'worker must be authenticated';
+ foreach mode in array array['entry_level','required_certificates','recommended_department','closed','unreadable','missing_facts','pass'] loop
+  update public.companies set posting_instance_key=mode,status='신규후보' where id=cid;
+  select id into qid from public.independent_verification_queue where company_id=cid order by id desc limit 1;
+  job:=public.verification_worker('claim',jsonb_build_object('queue_id',qid),'rollback-test-token');
+  assert job is not null,'claim required';
+  assert not(job ?| array['notes','job_title','recommendation_score','verification_notes','career_value','commute_minutes']),'claim leaks main';
+  denied:=false;
+  begin perform public.verification_worker('main',job,'rollback-test-token'); exception when others then denied:=true; end;
+  assert denied,'unsealed main read must fail';
+  r:=jsonb_build_object('company_name','PIPELINE ROLLBACK TEST','job_url','https://example.invalid/job/2','checked_at',now(),'access_status',case when mode='unreadable' then 'unreadable' else 'readable' end,'posting_status',case when mode='closed' then 'closed' else 'open' end,'posting_title','개발 공고','deadline','상시모집','departments',jsonb_build_array(jsonb_build_object('name','개발','duties','개발','entry_level','가능','education','무관','major','무관','required_certificates','명시 없음','required_skills','명시 없음','location','서울')),'unknowns','[]'::jsonb,'evidence',jsonb_build_array('fixture original posting'));
+  if mode='missing_facts' then r:=r||jsonb_build_object('deadline',null); end if;
+  sealed:=public.verification_worker('seal',job||jsonb_build_object('report',r,'agent_id','isolated-test-'||mode),'rollback-test-token');
+  assert sealed->>'report_hash' is not null,'hash required';
+  answer:=public.verification_worker('main',job,'rollback-test-token');
+  assert answer->>'job_title'='개발','sealed main read must work';
+  denied:=false;
+  begin perform public.verification_worker('seal',job||jsonb_build_object('report',r,'agent_id','other'),'rollback-test-token'); exception when others then denied:=true; end;
+  assert denied,'sealed report must be immutable';
+  select jsonb_agg(jsonb_build_object('field',f,'outcome',case when f=mode then 'conflict' else 'match' end,'evidence','fixture original evidence')) into checks from unnest(array['posting_status','posting_title','departments','recommended_department','entry_level','education','major','required_certificates','required_skills','location','deadline'])f;
+  answer:=public.verification_worker('finalize',job||sealed||jsonb_build_object('comparison',jsonb_build_object('checks',checks,'summary','fixture comparison')),'rollback-test-token');
+  assert answer->>'status'=case when mode='closed' then '마감확인' when mode in ('unreadable','missing_facts') then '확인불가' when mode='pass' then '독립검증 통과' else '검증충돌' end,'incorrect final classification';
+  assert (select report_sealed_at<=compared_at from public.independent_verification_queue where id=qid),'compare preceded sealing';
+  if mode='closed' then assert (select status='마감' and archived_recommendation_score=81 and recommendation_score=0 from public.companies where id=cid),'closed records must archive, not delete'; end if;
+ end loop;
+ update public.companies set status='제외' where id=cid;
+ answer:=public.verification_worker('record_posting',jsonb_build_object('company_id',cid,'company_name','PIPELINE ROLLBACK TEST','job_url','https://example.invalid/job/repost'),'rollback-test-token');
+ assert (answer->>'is_reposting')::boolean,'discovery must detect repost';
+ assert (select status='제외' from public.companies where id=cid),'discovery must preserve manual exclusion';
+end $$;
+select 'PASS: events, dedupe, isolation, sealing, 3 conflicts, closed, unreadable, pass, archive' as result;
+rollback;
