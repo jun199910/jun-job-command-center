@@ -22,8 +22,12 @@ async function agent(prompt,web,dir,originalUrl){
  const child=spawn(config.codex||'codex',args,{env,windowsHide:true,stdio:['pipe','pipe','pipe'],cwd:empty});
  const timeout=setTimeout(()=>child.kill(),8*60*1000);
  child.stdout.on('data',b=>{trace+=b;});child.stderr.on('data',b=>{stderr+=b;});child.stdin.end(prompt);
- await new Promise((resolve,reject)=>{child.on('error',reject);child.on('exit',code=>code===0?resolve():reject(Error('Isolated Codex exited '+code+': '+stderr.slice(-600))));}).finally(()=>clearTimeout(timeout));
+ const code=await new Promise((resolve,reject)=>{child.on('error',reject);child.on('close',resolve);}).finally(()=>clearTimeout(timeout));
  fs.writeFileSync(path.join(dir,web?'blind-trace.jsonl':'comparison-trace.jsonl'),trace);
+ if(code!==0){
+  const failures=trace.split('\n').map(l=>{try{return JSON.parse(l)}catch{return {}}}).filter(e=>e.type==='error'||e.type==='turn.failed').map(e=>e.message||e.error?.message||JSON.stringify(e));
+  throw Error('Isolated Codex exited '+code+': '+(failures.join(' | ')||stderr||'No diagnostic emitted').slice(-800));
+ }
  for(const line of trace.split('\n')){if(!line.trim())continue;let e;try{e=JSON.parse(line)}catch{continue}if(e.type==='thread.started')threadId=e.thread_id;if(['command_execution','mcp_tool_call'].includes(e.item?.type))throw Error('Forbidden tool in isolated context');}
  if(!threadId)throw Error('No isolated thread identity');
  const audit=await require('./source-audit.cjs').audit(trace,originalUrl);
@@ -49,8 +53,9 @@ async function recoverBlind(job,dir){
  }
  return null;
 }
-let busy=false,pending=false,done=0;
+let busy=false,pending=false,done=0,cooldownUntil=0;
 async function drain(){
+ if(Date.now()<cooldownUntil)return;
  if(busy){pending=true;return;}busy=true;
  try{
  do {pending=false;
@@ -80,7 +85,9 @@ async function drain(){
    if(result.status!==resultFor(report,comparison))throw Error('Server/client result mismatch');
    fs.writeFileSync(path.join(dir,'result.json'),JSON.stringify(result,null,2));
    log('completed',{queue_id:job.queue_id,status:result.status,applied_to_current:result.applied_to_current});done++;
-  }catch(e){log('job_error',{queue_id:job.queue_id,error:e.message});await rpc('error',{...claim,error:e.message}).catch(x=>log('error_save_failed',{error:x.message}));done++;}
+  }catch(e){log('job_error',{queue_id:job.queue_id,error:e.message});await rpc('error',{...claim,error:e.message}).catch(x=>log('error_save_failed',{error:x.message}));done++;
+   if(/usage.limit|rate.limit|quota|authentication|unauthorized|token.expired|401|429/i.test(e.message)){cooldownUntil=Date.now()+30*60*1000;log('dispatcher_cooldown',{until:new Date(cooldownUntil).toISOString()});break;}
+  }
   finally{clearInterval(heartbeat);}
  }while(!config.maxJobs||done<config.maxJobs);
  }catch(e){log('dispatcher_error',{error:e.message});}
