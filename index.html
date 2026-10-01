@@ -38,7 +38,7 @@ table{table-layout:fixed;min-width:1050px}td{overflow-wrap:anywhere}th:nth-child
 <main>
 <section class="metrics">
 <div class="card"><div class="muted">전체 후보</div><div id="mAll" class="metric">0</div></div>
-<div class="card"><div class="muted">A티어 이상</div><div id="mTop" class="metric good">0</div></div>
+<div class="card"><div class="muted">70점 이상</div><div id="mTop" class="metric good">0</div></div>
 <div class="card"><div class="muted">지원 예정/완료</div><div id="mApply" class="metric">0</div></div>
 <div class="card"><div class="muted">검증 필요</div><div id="mVerify" class="metric warn">0</div></div>
 </section>
@@ -183,7 +183,7 @@ function render(){
   if(details.open){analyzed.add(key);const c=companies.find(c=>String(c.id)===key);if(c)details.querySelector('.analysis-grid').innerHTML=analysisHTML(c)}else analyzed.delete(key);
  });
  mAll.textContent=companies.filter(c=>!['제외','마감'].includes(c.status)).length;
- mTop.textContent=companies.filter(c=>!['제외','마감'].includes(c.status)&&['S','A'].includes(tier(c))).length;
+ mTop.textContent=companies.filter(c=>!['제외','마감'].includes(c.status)&&c.recommendation_score>=70).length;
  mApply.textContent=companies.filter(c=>['지원예정','지원완료'].includes(c.status)).length;
  mVerify.textContent=companies.filter(c=>c.status!=='마감'&&!['통과','검증완료','독립검증 통과'].includes(c.verification_status||'')).length;
 }
