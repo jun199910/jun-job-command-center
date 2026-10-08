@@ -10,17 +10,18 @@ header{position:sticky;top:0;z-index:5;background:var(--header);border-bottom:1p
 h1{margin:0;font-size:22.5px}.muted{color:var(--muted);font-size:13.5px}main{max-width:1450px;margin:auto;padding:22px}
 .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(46,64,80,.035)}
 .metric{font-size:32.5px;font-weight:850;margin-top:4px}.section{margin-top:16px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
-input,select,button{font-size:15px;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:9px;padding:9px 10px}
+input,select,button,textarea{font-size:15px;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:9px;padding:9px 10px}
 button{cursor:pointer}.primary{background:var(--blue);color:var(--on-blue);border:0;font-weight:800}
 input::placeholder{color:var(--muted);opacity:1}
-input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+input:focus-visible,select:focus-visible,button:focus-visible,textarea:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
 table{width:100%;border-collapse:collapse;font-size:14.5px}th,td{border-bottom:1px solid var(--line);padding:11px 8px;text-align:left;vertical-align:top}th{color:var(--muted);white-space:nowrap}
 a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 7px;margin:1px;background:var(--panel2)}.tier{font-weight:900;font-size:15.75px}
 .good{color:var(--green)}.warn{color:var(--yellow)}.bad{color:var(--red)}.actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}.actions a{border:1px solid var(--line);padding:4px 7px;border-radius:7px;font-size:12.5px;background:var(--panel2)}
 details{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px}summary{cursor:pointer;color:var(--text)}
 .log{padding:10px 0;border-bottom:1px solid var(--line)}.log:last-child{border:0}.legend{line-height:1.8}
 .pill{white-space:nowrap}.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}.tag{font-size:13px;border:1px solid var(--line);border-radius:6px;padding:2px 5px;background:var(--panel2)}
-table{table-layout:fixed;min-width:1050px}td{overflow-wrap:anywhere}th:nth-child(1){width:8%}th:nth-child(2){width:23%}th:nth-child(3){width:14%}th:nth-child(4){width:13%}th:nth-child(5){width:14%}th:nth-child(6){width:13%}th:nth-child(7){width:8%}th:nth-child(8){width:7%}
+table{table-layout:fixed;min-width:1200px}td{overflow-wrap:anywhere}th:nth-child(1){width:8%}th:nth-child(2){width:20%}th:nth-child(3){width:18%}th:nth-child(4){width:13%}th:nth-child(5){width:12%}th:nth-child(6){width:12%}th:nth-child(7){width:10%}th:nth-child(8){width:7%}
+.memo-input{display:block;width:100%;min-height:82px;resize:vertical;line-height:1.45}.memo-status{display:block;min-height:1.4em;margin-top:4px;font-size:12.5px}.memo-status.error{color:var(--red)}
 .career-preview{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;white-space:normal;overflow:hidden;line-height:1.5;max-height:3em;margin-top:5px}.view-button{white-space:nowrap;padding:7px;font-size:14px}.summary-row>td{padding:12px;background:var(--panel2)}
 .summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.summary-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px;font-size:14px;line-height:1.65;min-width:0}.summary-card h3{font-size:14px;margin:0 0 7px;color:var(--blue)}.summary-card p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}.summary-title{margin:0 0 10px;font-size:16px}
 .analysis{margin-top:12px}.analysis>summary{display:inline-block;border:1px solid var(--line);border-radius:8px;padding:8px 12px;background:var(--panel);font-weight:700}.analysis>summary::before{content:'▶ ';font-size:12px}.analysis[open]>summary::before{content:'▼ '}.analysis-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}.analysis-section{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}.analysis-section h4{margin:0 0 10px;font-size:15px}.analysis-section dl{margin:0;font-size:14px;line-height:1.65}.analysis-section dt{color:var(--muted);margin-top:10px}.analysis-section dd{margin:3px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}.summary-row[hidden]{display:none}
@@ -52,7 +53,7 @@ table{table-layout:fixed;min-width:1050px}td{overflow-wrap:anywhere}th:nth-child
 <button class="primary" id="refresh">DB 새로고침</button>
 </div>
 <div style="overflow:auto">
-<table><thead><tr><th>점수·티어</th><th>회사 / 직무</th><th>독립 검증</th><th>자격</th><th>통근</th><th>경력가치</th><th>상태</th><th>상세</th></tr></thead><tbody id="rows"></tbody></table>
+<table><thead><tr><th>점수·티어</th><th>회사 / 직무</th><th>내 메모</th><th>독립 검증</th><th>자격</th><th>통근</th><th>경력가치</th><th>상세</th></tr></thead><tbody id="rows"></tbody></table>
 </div>
 </section>
 
@@ -83,6 +84,7 @@ const verifyLabel=s=>({'독립검증 통과':'✓ 독립검증 통과','독립�
 const date=s=>s?new Date(s).toLocaleDateString('ko-KR'):'미확인';
 const statusFilter=document.getElementById('status');
 const expanded=new Set(), analyzed=new Set();
+const memoState=new Map();
 const present=v=>v!==null&&v!==undefined&&String(v).trim()!=='';
 const value=v=>!present(v)?'확인 필요':typeof v==='object'?JSON.stringify(v,null,2):typeof v==='boolean'?(v?'예':'아니오'):String(v);
 const short=(v,n=100)=>{const s=value(v).replace(/\s+/g,' ').trim();return s.length>n?s.slice(0,n)+'…':s};
@@ -141,6 +143,26 @@ function analysisHTML(c){
  return groups.filter(([,fields])=>Object.keys(fields).some(k=>k in c)).map(([title,fields])=>`<section class="analysis-section"><h4>${E(title)}</h4><dl>${Object.entries(fields).filter(([key])=>key in c).map(([key,label])=>`<dt>${E(label)}</dt><dd>${E(value(c[key]))}</dd>`).join('')}</dl></section>`).join('');
 }
 
+async function saveMemo(textarea){
+ const key=textarea.dataset.memoCompany,state=memoState.get(key)||{saving:false,lastSaved:String(companies.find(c=>String(c.id)===key)?.user_memo??''),queued:null};
+ memoState.set(key,state);
+ const status=textarea.parentElement.querySelector('.memo-status'),requested=textarea.value;
+ if(!state.saving&&requested===state.lastSaved)return;
+ if(state.saving){state.queued=requested;status.textContent='저장 중…';status.classList.remove('error');return}
+ state.saving=true;let next=requested;
+ while(next!==null){
+  state.queued=null;status.textContent='저장 중…';status.classList.remove('error');
+  try{
+   const response=await fetch(BASE+'companies?id=eq.'+encodeURIComponent(key),{method:'PATCH',headers:{...H,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({user_memo:next})});
+   if(!response.ok)throw Error('HTTP '+response.status);
+   state.lastSaved=next;const company=companies.find(c=>String(c.id)===key);if(company)company.user_memo=next;
+   status.textContent='저장됨';
+  }catch(error){status.textContent='저장 실패 · 다시 시도';status.classList.add('error');state.saving=false;return}
+  next=state.queued!==null&&state.queued!==state.lastSaved?state.queued:null;
+ }
+ state.saving=false;
+}
+
 async function load(){
  sync.textContent='DB 동기화 중…';
  try{
@@ -167,16 +189,19 @@ function render(){
   return `<tr${index===boundary?' class="score-boundary"':''}>
    <td><span class="tier">${E(c.recommendation_score??'-')} (${t})</span></td>
    <td><b>${E(c.company_name)}</b><br><span class="muted">${E(c.job_title)}</span><div class="tags">${companyTags(c).map(x=>`<span class="tag ${x.warn?'warn':''}" title="${E(x.evidence)}">${E(x.label)}</span>`).join('')}</div><div class="actions">${c.job_url?`<a href="${E(c.job_url)}" target="_blank" rel="noopener noreferrer">공고 보기</a>`:''}${c.map_url?`<a href="${E(c.map_url)}" target="_blank" rel="noopener noreferrer">지도</a>`:''}${c.route_url?`<a href="${E(c.route_url)}" target="_blank" rel="noopener noreferrer">길찾기</a>`:''}</div></td>
+   <td><textarea class="memo-input" data-memo-company="${E(key)}" aria-label="${E(c.company_name)} 내 메모" placeholder="잡플래닛 점수, 후기, 지원 여부, 확인할 점 등을 자유롭게 적어주세요.">${E(c.user_memo??'')}</textarea><span class="memo-status muted" aria-live="polite"></span></td>
    <td><span class="${vClass(verify)}">${E(verifyLabel(verify))}</span><br><span class="muted">신뢰도 ${conf} · 출처 ${E(c.source_grade||'-')}</span><br><span class="muted">검증 ${date(verifiedAt)}</span></td>
    <td>${E(licenseDisplay(c.license_requirement))}<br><span class="muted">신입: ${c.entry_level_ok===true?'가능':c.entry_level_ok===false?'불가':'미확인'}</span></td>
    <td>${E(c.location)}<br><span class="muted">${E(commute||'미확인')}</span><br><span class="muted">${E(c.nearest_station||'')}</span></td>
    <td>${E(c.career_value||'미확인')}${present(c.expected_career_path)?`<span class="muted career-preview" title="${E(c.expected_career_path)}">${E(careerPreview(c.expected_career_path))}</span>`:''}</td>
-   <td><span class="pill">${E(c.status)}</span></td>
    <td><button class="view-button" data-company="${E(key)}" aria-controls="${E(panel)}" aria-expanded="${expanded.has(key)}" aria-label="${E(c.company_name)} 핵심 요약">${expanded.has(key)?'▼ 닫기':'▶ 보기'}</button></td>
   </tr><tr class="summary-row" id="${E(panel)}" ${expanded.has(key)?'':'hidden'}><td colspan="8"><h3 class="summary-title">${E(c.company_name)} · 지원 결정 요약</h3><div class="summary-grid">${summaryCards(c)}</div><details class="analysis" data-analysis="${E(key)}" ${analyzed.has(key)?'open':''}><summary>상세 분석</summary><div class="analysis-grid">${analyzed.has(key)?analysisHTML(c):''}</div></details></td></tr>`}).join('')||'<tr><td colspan="8" class="muted">조건에 맞는 회사가 없습니다.</td></tr>';
  rows.querySelectorAll('[data-company]').forEach(button=>button.onclick=()=>{
   const key=button.dataset.company,open=!expanded.has(key);open?expanded.add(key):expanded.delete(key);
   document.getElementById(button.getAttribute('aria-controls')).hidden=!open;button.setAttribute('aria-expanded',String(open));button.textContent=open?'▼ 닫기':'▶ 보기';
+ });
+ rows.querySelectorAll('[data-memo-company]').forEach(textarea=>{
+  textarea.onchange=()=>saveMemo(textarea);textarea.onblur=()=>saveMemo(textarea);
  });
  rows.querySelectorAll('[data-analysis]').forEach(details=>details.ontoggle=()=>{
   const key=details.dataset.analysis;
