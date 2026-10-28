@@ -1,220 +1,40 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JUN Job Command Center V4</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JUN job</title>
 <style>
-:root{color-scheme:light;--bg:#e9eef1;--panel:#f6f7f4;--panel2:#edf1f2;--line:#d4dde0;--text:#2e4050;--muted:#566977;--blue:#38628b;--green:#326c59;--yellow:#856323;--red:#a34d4d;--header:#f2f5f2ee;--on-blue:#f6f7f4}
-*{box-sizing:border-box}body{margin:0;font-size:18px;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}
-header{position:sticky;top:0;z-index:5;background:var(--header);border-bottom:1px solid var(--line);padding:16px 22px;backdrop-filter:blur(8px)}
-h1{margin:0;font-size:22.5px}.muted{color:var(--muted);font-size:13.5px}main{max-width:1450px;margin:auto;padding:22px}
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(46,64,80,.035)}
-.metric{font-size:32.5px;font-weight:850;margin-top:4px}.section{margin-top:16px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
-input,select,button,textarea{font-size:15px;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:9px;padding:9px 10px}
-button{cursor:pointer}.primary{background:var(--blue);color:var(--on-blue);border:0;font-weight:800}
-input::placeholder{color:var(--muted);opacity:1}
-input:focus-visible,select:focus-visible,button:focus-visible,textarea:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
-table{width:100%;border-collapse:collapse;font-size:14.5px}th,td{border-bottom:1px solid var(--line);padding:11px 8px;text-align:left;vertical-align:top}th{color:var(--muted);white-space:nowrap}
-a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 7px;margin:1px;background:var(--panel2)}.tier{font-weight:900;font-size:15.75px}
-.good{color:var(--green)}.warn{color:var(--yellow)}.bad{color:var(--red)}.actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}.actions a{border:1px solid var(--line);padding:4px 7px;border-radius:7px;font-size:12.5px;background:var(--panel2)}
-details{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px}summary{cursor:pointer;color:var(--text)}
-.log{padding:10px 0;border-bottom:1px solid var(--line)}.log:last-child{border:0}.legend{line-height:1.8}
-.pill{white-space:nowrap}.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}.tag{font-size:13px;border:1px solid var(--line);border-radius:6px;padding:2px 5px;background:var(--panel2)}
-table{table-layout:fixed;min-width:1200px}td{overflow-wrap:anywhere}th:nth-child(1){width:8%}th:nth-child(2){width:20%}th:nth-child(3){width:18%}th:nth-child(4){width:13%}th:nth-child(5){width:12%}th:nth-child(6){width:12%}th:nth-child(7){width:10%}th:nth-child(8){width:7%}
-.memo-input{display:block;width:100%;min-height:82px;resize:vertical;line-height:1.45}.memo-status{display:block;min-height:1.4em;margin-top:4px;font-size:12.5px}.memo-status.error{color:var(--red)}
-.career-preview{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;white-space:normal;overflow:hidden;line-height:1.5;max-height:3em;margin-top:5px}.view-button{white-space:nowrap;padding:7px;font-size:14px}.summary-row>td{padding:12px;background:var(--panel2)}
-.summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.summary-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px;font-size:14px;line-height:1.65;min-width:0}.summary-card h3{font-size:14px;margin:0 0 7px;color:var(--blue)}.summary-card p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}.summary-title{margin:0 0 10px;font-size:16px}
-.analysis{margin-top:12px}.analysis>summary{display:inline-block;border:1px solid var(--line);border-radius:8px;padding:8px 12px;background:var(--panel);font-weight:700}.analysis>summary::before{content:'▶ ';font-size:12px}.analysis[open]>summary::before{content:'▼ '}.analysis-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}.analysis-section{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}.analysis-section h4{margin:0 0 10px;font-size:15px}.analysis-section dl{margin:0;font-size:14px;line-height:1.65}.analysis-section dt{color:var(--muted);margin-top:10px}.analysis-section dd{margin:3px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}.summary-row[hidden]{display:none}
-.score-boundary>td{border-top:4px solid var(--blue)}
-@media(max-width:900px){.summary-grid,.analysis-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:900px){.metrics{grid-template-columns:1fr 1fr}table{display:block;overflow:auto}}
+:root{color-scheme:light;--bg:#f4f6f8;--card:#fff;--line:#e4e9ee;--text:#17212b;--muted:#6b7785;--blue:#315f8c;--blue-soft:#eef5fb;--green:#2f7659;--green-soft:#edf8f2;--amber:#9a6c1b;--amber-soft:#fff7e8;--red:#a84c4c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}header{position:sticky;top:0;z-index:10;background:rgba(244,246,248,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}.header-inner{max-width:1180px;margin:auto;padding:18px 22px;display:flex;align-items:end;justify-content:space-between;gap:16px}.brand h1{margin:0;font-size:28px;letter-spacing:-.7px}.brand p{margin:3px 0 0;color:var(--muted);font-size:13px}.sync{font-size:12px;color:var(--muted);white-space:nowrap}main{max-width:1180px;margin:auto;padding:22px}.section{margin-bottom:24px}.section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px}.section-title h2{margin:0;font-size:19px}.section-title .sub{font-size:12px;color:var(--muted)}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}.stat .label{font-size:12px;color:var(--muted)}.stat .value{font-size:25px;font-weight:800;margin-top:3px}.tasks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.task{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 15px;display:grid;grid-template-columns:1fr auto;gap:8px 14px}.task .company{font-weight:800}.task .action{font-size:14px;line-height:1.5}.task .when{font-size:12px;color:var(--amber);font-weight:700;white-space:nowrap}.task a{font-size:12px;color:var(--blue);text-decoration:none}.group{margin-top:22px}.group h3{font-size:14px;margin:0 0 8px;color:var(--muted);font-weight:800}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.job{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0}.job-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.company-wrap{min-width:0}.company-name{font-size:18px;font-weight:850;line-height:1.25}.role{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.4}.score{font-weight:900;font-size:16px;white-space:nowrap;color:var(--blue)}.badges{display:flex;flex-wrap:wrap;gap:6px;margin:11px 0}.badge{border-radius:999px;padding:4px 8px;font-size:11px;font-weight:750;background:#f1f4f6;color:#4d5965}.badge.interview{background:var(--green-soft);color:var(--green)}.badge.apply{background:var(--blue-soft);color:var(--blue)}.badge.wait{background:#f3f1fb;color:#65558b}.badge.hold{background:var(--amber-soft);color:var(--amber)}.next{background:var(--blue-soft);border-radius:11px;padding:10px 11px;margin:10px 0 12px}.next .k{font-size:11px;color:var(--blue);font-weight:850;margin-bottom:3px}.next .v{font-size:13px;line-height:1.5}.meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0}.meta-box{background:#f8fafb;border:1px solid #edf0f3;border-radius:10px;padding:9px}.meta-box .k{font-size:10.5px;color:var(--muted);margin-bottom:3px}.meta-box .v{font-size:12px;line-height:1.35;overflow-wrap:anywhere}.line{font-size:12.5px;line-height:1.55;margin-top:7px}.line b{font-size:11px;margin-right:5px;color:var(--muted)}.strength b{color:var(--green)}.risk b{color:var(--red)}.links{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}.links a{font-size:11.5px;text-decoration:none;color:var(--blue);border:1px solid var(--line);padding:5px 8px;border-radius:7px;background:#fff}.memo{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}.memo label{display:block;font-size:11px;color:var(--muted);font-weight:800;margin-bottom:5px}.memo textarea{width:100%;min-height:58px;border:1px solid var(--line);border-radius:9px;padding:8px 9px;font:inherit;font-size:12.5px;resize:vertical;background:#fbfcfd;color:var(--text)}.memo textarea:focus{outline:2px solid #b9cee1;border-color:#9ebbd5}.memo-status{font-size:10.5px;color:var(--muted);height:15px;margin-top:3px}.empty{background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:18px;color:var(--muted);font-size:13px}.refresh{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer}@media(max-width:850px){.stats{grid-template-columns:repeat(2,1fr)}.tasks,.cards{grid-template-columns:1fr}.meta{grid-template-columns:1fr 1fr}.header-inner{align-items:flex-start;flex-direction:column}.sync{white-space:normal}}@media(max-width:520px){main{padding:14px}.header-inner{padding:14px}.brand h1{font-size:24px}.meta{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<header>
-<h1>JUN JOB COMMAND CENTER <span style="color:var(--blue)">V4</span></h1>
-<div class="muted">취업 컨설턴트 + 독립 검증원 · 기준역 연신내 · Supabase Live DB</div>
-<div id="sync" class="muted">DB 연결 중…</div>
-</header>
+<header><div class="header-inner"><div class="brand"><h1>JUN job</h1><p>지원 현황 · 다음 행동 · 핵심 판단만 한 페이지에</p></div><div id="sync" class="sync">DB 연결 중…</div></div></header>
 <main>
-<section class="metrics">
-<div class="card"><div class="muted">전체 후보</div><div id="mAll" class="metric">0</div></div>
-<div class="card"><div class="muted">70점 이상</div><div id="mTop" class="metric good">0</div></div>
-<div class="card"><div class="muted">지원 예정/완료</div><div id="mApply" class="metric">0</div></div>
-<div class="card"><div class="muted">검증 필요</div><div id="mVerify" class="metric warn">0</div></div>
-</section>
-
-<section class="section card">
-<h2>지원 후보 / 의사결정 보드</h2>
-<div class="toolbar">
-<input id="q" placeholder="회사·직무 검색">
-<select id="status"><option value="">현재 후보 (마감 제외)</option><option>신규후보</option><option>검증중</option><option>지원예정</option><option>지원완료</option><option>서류합격</option><option>면접</option><option>제외</option><option>마감</option></select>
-<select id="tierFilter"><option value="">티어 전체</option><option>S</option><option>A</option><option>B</option><option>C</option><option>D</option><option>X</option></select>
-<button class="primary" id="refresh">DB 새로고침</button>
-</div>
-<div style="overflow:auto">
-<table><thead><tr><th>점수·티어</th><th>회사 / 직무</th><th>내 메모</th><th>독립 검증</th><th>자격</th><th>통근</th><th>경력가치</th><th>상세</th></tr></thead><tbody id="rows"></tbody></table>
-</div>
-</section>
-
-<section class="section" style="display:grid;grid-template-columns:2fr 1fr;gap:16px">
-<div class="card"><h2>최근 업데이트</h2><div id="logs"><div class="muted">불러오는 중…</div></div></div>
-<div class="card"><h2>평가 기준</h2><div class="legend muted">
-<b style="color:var(--text)">티어</b><br>S 90–100 · A 80–89 · B 70–79 · C 60–69 · D 0–59 · X 제외<br><br>
-<b style="color:var(--text)">독립 검증원</b><br>회사명과 정확한 원공고만 먼저 읽고 보고서를 확정한 뒤, 메인 분석의 객관적 공고 사실과 비교합니다. 점수·경력가치·통근 평가는 메인 분석에서 담당합니다.<br><br>
-<b style="color:var(--text)">출처 등급</b><br>A 1차/공식자료 · B 주요 채용플랫폼 · C 후기/경험자료 · D 추정/출처불명
-</div></div>
-</section>
-
-<section class="section card"><h2>운영 원칙</h2><div class="muted" style="line-height:1.8">
-전기기사 필수 공고는 현재 원칙적 제외. 신입 가능 여부, 전공 적합성, 실제 통근 부담, 경력가치, 회사 건전성, 워라밸 위험을 함께 본다.
-미확인 정보는 긍정으로 추정하지 않는다. <b>오류 발견</b>과 <b>미확인</b>을 구분하며, 검증 신뢰도는 근거가 확보된 정도를 나타낸다.
-</div></section>
+<section class="stats"><div class="stat"><div class="label">진행 중</div><div class="value" id="sProgress">0</div></div><div class="stat"><div class="label">지원 예정</div><div class="value" id="sPlan">0</div></div><div class="stat"><div class="label">면접</div><div class="value" id="sInterview">0</div></div><div class="stat"><div class="label">대기 / 후순위</div><div class="value" id="sWait">0</div></div></section>
+<section class="section"><div class="section-title"><div><h2>지금 할 일</h2><div class="sub">마감과 다음 일정 기준</div></div><button id="refresh" class="refresh">새로고침</button></div><div id="tasks" class="tasks"></div></section>
+<section class="section"><div class="section-title"><div><h2>지원 보드</h2><div class="sub">AI 판단과 내 메모를 분리해서 표시</div></div></div><div id="groups"></div></section>
 </main>
-
 <script>
 const BASE='https://iifuvchvjhzursffvvzk.supabase.co/rest/v1/';
 const KEY='sb_publishable_HUif7UBTbshBV-SdR0oSYA_b1GC0iM0';
-let companies=[],activity=[];
-const H={apikey:KEY};
-const E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const tier=c=>c.status==='제외'?'X':c.recommendation_score>=90?'S':c.recommendation_score>=80?'A':c.recommendation_score>=70?'B':c.recommendation_score>=60?'C':'D';
-const vClass=s=>/통과/.test(s||'')?'good':/오류|실패|충돌/.test(s||'')?'bad':'warn';
-const verifyLabel=s=>({'독립검증 통과':'✓ 독립검증 통과','독립검증 대기':'◷ 독립검증 대기','독립검증 중':'↻ 독립검증 중','검증충돌':'⚠ 검증충돌','확인불가':'? 확인불가','마감확인':'마감'}[s]||s);
-const date=s=>s?new Date(s).toLocaleDateString('ko-KR'):'미확인';
-const statusFilter=document.getElementById('status');
-const expanded=new Set(), analyzed=new Set();
-const memoState=new Map();
-const present=v=>v!==null&&v!==undefined&&String(v).trim()!=='';
-const value=v=>!present(v)?'확인 필요':typeof v==='object'?JSON.stringify(v,null,2):typeof v==='boolean'?(v?'예':'아니오'):String(v);
-const short=(v,n=100)=>{const s=value(v).replace(/\s+/g,' ').trim();return s.length>n?s.slice(0,n)+'…':s};
-const careerPreview=v=>value(v).replace(/\s+/g,' ').trim();
-const licenseDisplay=v=>'기사: '+String(v??'').replace(/^(?:\s*기사\s*[:：]\s*)+/,'').trim();
-const sentences=v=>String(v||'').split(/(?<=[.!?])\s+|\n|\s*\|\s*/).filter(Boolean);
-function companyTags(c){
- const tags=[],add=(label,evidence,warn=false)=>tags.push({label,evidence,warn});
- const clauses=[c.license_requirement,c.notes,c.verification_notes].flatMap(sentences);
- const driving=clauses.find(s=>/운전(?:면허|가능|능력|경험)?(?:·운전가능)?\s*(?:은|는|이|가)?\s*필수/.test(s)&&!/(필수\s*(아님|아니|없)|필수\s*여부|과거)/.test(s));
- if(driving)add('⚠ 운전필수',driving,true);
- const cad=clauses.find(s=>/\b(?:Auto)?CAD\b/i.test(s)&&/확인|검증|미충족|필수/.test(s)&&!/CAD\s*필수\s*아님/i.test(s));
- if(cad)add('⚠ CAD확인',cad,true);
- const field=String(c.job_title||'').match(/\bESS\b|\bDTS\b|\bUPS\b|\bPLC\b|태양광|전력기기|전력계통|전기계통/i);
- if(field)add(field[0],c.job_title);
- if(c.entry_level_ok===true)add('신입OK','DB 신입 지원 가능: 예');
- const license=String(c.license_requirement||'');
- if(/필수\s*아님|우대/.test(license)&&!/확인|검증|상이/.test(license))add('기사필수X',license);
- if(c.career_value==='높음')add('경력가치↑','DB 경력가치: 높음');
- if(c.commute_grade==='양호')add('통근양호','DB 통근등급: 양호');
- return tags.slice(0,4);
-}
-function commuteText(c){return [c.commute_minutes!=null?c.commute_minutes+'분':null,c.transfers!=null?c.transfers+'회 환승':null,(c.walk_minutes??c.walking_minutes)!=null?'도보 '+(c.walk_minutes??c.walking_minutes)+'분':null,c.commute_tier?'통근 '+c.commute_tier:c.commute_grade].filter(Boolean).join(' · ')}
-function independentCard(c){
- const v=c.independent_verification;if(!v)return '';
- const labels={posting_status:'진행/마감',posting_title:'공고 제목',departments:'모집부문',recommended_department:'추천 모집부문',entry_level:'신입/경력',education:'학력',major:'전공',required_certificates:'필수 자격증',required_skills:'필수 스킬',location:'근무지',deadline:'마감일'};
- const time=s=>s?new Date(s).toLocaleString('ko-KR'):'확인 필요';
- const conflicts=Array.isArray(v.conflicts)?v.conflicts.map(x=>'• '+(labels[x.field]||x.field)+': '+value(x.evidence)).join('\n'):'';
- const source=/^https?:\/\//.test(v.job_url||'')?`<a href="${E(v.job_url)}" target="_blank" rel="noopener noreferrer">${E(v.job_url)}</a>`:'확인 필요';
- return `<section class="summary-card"><h3>독립검증 실행 기록</h3><p>${E(verifyLabel(v.status))}\n검증일: ${E(time(v.verified_at))}\n신뢰도: ${E(v.confidence==null?'수치 미산정':v.confidence+'%')} · 출처 등급: ${E(value(c.source_grade))}\n${E(value(v.summary))}${conflicts?'\n충돌 항목:\n'+E(conflicts):''}\n1차 보고서 확정: ${E(time(v.report_sealed_at))}\n비교 수행: ${E(time(v.compared_at))}\n검증 대상 원공고: ${source}</p></section>`;
-}
-function summaryCards(c){
- const caution=[...new Set([c.license_requirement,c.notes,c.verification_notes,c.company_review].flatMap(sentences).filter(s=>/필수|확인\s*(필요|전|해야)|재확인|검증 필요|위험|부담|출장|외근|미충족|제외/.test(s)))];
- if(c.commute_grade==='부담')caution.unshift('통근등급: 부담');
- const cards=[
- ['지원 판단','등록 상태: '+value(c.status)+'\n신입 지원: '+(c.entry_level_ok===true?'가능':c.entry_level_ok===false?'불가':'확인 필요')+'\n자격: '+value(c.license_requirement)],
- ['점수 / 티어와 핵심 이유',value(c.recommendation_score)+'점 · '+tier(c)+'티어\n컨설턴트 메모: '+short(c.notes,160)],
- ['주의사항',caution.length?caution.slice(0,3).map(s=>'• '+short(s,120)).join('\n'):'확인 필요'],
- ['2~3년 후 경력 방향','경력가치: '+value(c.career_value_2y3y)+'\n'+short(c.expected_career_path,180)],
- ['통근',[value(c.location),commuteText(c)||'소요시간·환승: 확인 필요','인근역: '+value(c.nearest_station),'상세: '+short(c.commute_detail,100)].join('\n')],
- ['검증 신뢰도 / 출처 / 검증일',value(c.verification_status)+' · 신뢰도 '+(c.verification_confidence==null?'확인 필요':c.verification_confidence+'%')+'\n출처 등급: '+value(c.source_grade)+' · 검증일: '+(c.last_verified_at?date(c.last_verified_at):'확인 필요')+'\n'+short(c.verification_notes,130)]
- ];
- return (c.independent_verification?cards.slice(0,5):cards).map(([title,body])=>`<section class="summary-card"><h3>${E(title)}</h3><p>${E(body)}</p></section>`).join('')+independentCard(c);
-}
-const fieldGroups=[
- ['공고 세부조건 / 필수·우대사항',{company_name:'회사명',job_title:'직무',job_url:'공고 링크',location:'근무지',entry_level_ok:'신입 지원 가능',license_requirement:'자격 / 필수·우대사항'}],
- ['지원 판단 / 점수',{status:'지원 상태',recommendation_score:'추천 점수',notes:'컨설턴트 메모 / 판단 근거·주의사항'}],
- ['회사 검증 / 위험요소',{company_review:'회사 평가 / 위험신호',verification_status:'검증 상태',verification_confidence:'검증 신뢰도 (%)',source_grade:'출처 등급',last_verified_at:'최근 검증일',verification_notes:'검증원 메모 / 공고 확인·위험요소'}],
- ['통근 상세',{commute_minutes:'통근 시간 (분)',transfers:'환승 횟수',walking_minutes:'도보 시간 (분)',walk_minutes:'도보 시간 (분, 기존 필드)',commute_grade:'통근 평가',commute_tier:'통근 티어',nearest_station:'인근역',commute_detail:'통근 상세',map_url:'지도 링크',route_url:'길찾기 링크'}],
- ['경력가치 / 예상 이직루트',{career_value:'경력가치',career_value_2y3y:'2~3년 후 경력가치',expected_career_path:'경력 방향 / 예상 이직루트'}],
- ['기록 정보',{id:'후보 ID',created_at:'등록일',updated_at:'수정일'}]
-];
-function analysisHTML(c){
- const known=new Set(fieldGroups.flatMap(([,fields])=>Object.keys(fields)));
- const groups=[...fieldGroups,['기타 상세정보',Object.fromEntries(Object.keys(c).filter(k=>!known.has(k)).map(k=>[k,k]))]];
- return groups.filter(([,fields])=>Object.keys(fields).some(k=>k in c)).map(([title,fields])=>`<section class="analysis-section"><h4>${E(title)}</h4><dl>${Object.entries(fields).filter(([key])=>key in c).map(([key,label])=>`<dt>${E(label)}</dt><dd>${E(value(c[key]))}</dd>`).join('')}</dl></section>`).join('');
-}
-
-async function saveMemo(textarea){
- const key=textarea.dataset.memoCompany,state=memoState.get(key)||{saving:false,lastSaved:String(companies.find(c=>String(c.id)===key)?.user_memo??''),queued:null};
- memoState.set(key,state);
- const status=textarea.parentElement.querySelector('.memo-status'),requested=textarea.value;
- if(!state.saving&&requested===state.lastSaved)return;
- if(state.saving){state.queued=requested;status.textContent='저장 중…';status.classList.remove('error');return}
- state.saving=true;let next=requested;
- while(next!==null){
-  state.queued=null;status.textContent='저장 중…';status.classList.remove('error');
-  try{
-   const response=await fetch(BASE+'companies?id=eq.'+encodeURIComponent(key),{method:'PATCH',headers:{...H,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({user_memo:next})});
-   if(!response.ok)throw Error('HTTP '+response.status);
-   state.lastSaved=next;const company=companies.find(c=>String(c.id)===key);if(company)company.user_memo=next;
-   status.textContent='저장됨';
-  }catch(error){status.textContent='저장 실패 · 다시 시도';status.classList.add('error');state.saving=false;return}
-  next=state.queued!==null&&state.queued!==state.lastSaved?state.queued:null;
- }
- state.saving=false;
-}
-
-async function load(){
- sync.textContent='DB 동기화 중…';
- try{
-  const [cr,lr]=await Promise.all([
-   fetch(BASE+'companies?select=*&order=recommendation_score.desc.nullslast',{headers:H}),
-   fetch(BASE+'activity_log?select=*&order=created_at.desc&limit=20',{headers:H})
-  ]);
-  if(!cr.ok||!lr.ok)throw Error('HTTP '+cr.status+'/'+lr.status);
-  companies=await cr.json();activity=await lr.json();
-  sync.textContent='● Supabase DB 연결됨 · '+new Date().toLocaleTimeString('ko-KR');
-  render();renderLogs();
- }catch(e){sync.textContent='DB 연결 오류: '+e.message}
-}
-function render(){
- const query=q.value.toLowerCase(),st=statusFilter.value,tf=tierFilter.value;
- const list=companies.filter(c=>(!query||(String(c.company_name)+' '+String(c.job_title)).toLowerCase().includes(query))&&(st?c.status===st:c.status!=='마감')&&(!tf||tier(c)===tf));
- const boundary=list.some(c=>c.recommendation_score!=null&&c.recommendation_score>=70)?list.findIndex(c=>c.recommendation_score!=null&&c.recommendation_score<70):-1;
- rows.innerHTML=list.map((c,index)=>{
-  const confidence=c.independent_verification?c.independent_verification.confidence:c.verification_confidence;
-  const verifiedAt=c.independent_verification?c.independent_verification.verified_at:c.last_verified_at;
-  const t=tier(c), conf=confidence==null?'--':confidence+'%';
-  const verify=c.independent_verification?.status||c.verification_status||'재검증';
-  const commute=commuteText(c),key=String(c.id),panel='company-summary-'+key;
-  return `<tr${index===boundary?' class="score-boundary"':''}>
-   <td><span class="tier">${E(c.recommendation_score??'-')} (${t})</span></td>
-   <td><b>${E(c.company_name)}</b><br><span class="muted">${E(c.job_title)}</span><div class="tags">${companyTags(c).map(x=>`<span class="tag ${x.warn?'warn':''}" title="${E(x.evidence)}">${E(x.label)}</span>`).join('')}</div><div class="actions">${c.job_url?`<a href="${E(c.job_url)}" target="_blank" rel="noopener noreferrer">공고 보기</a>`:''}${c.map_url?`<a href="${E(c.map_url)}" target="_blank" rel="noopener noreferrer">지도</a>`:''}${c.route_url?`<a href="${E(c.route_url)}" target="_blank" rel="noopener noreferrer">길찾기</a>`:''}</div></td>
-   <td><textarea class="memo-input" data-memo-company="${E(key)}" aria-label="${E(c.company_name)} 내 메모" placeholder="잡플래닛 점수, 후기, 지원 여부, 확인할 점 등을 자유롭게 적어주세요.">${E(c.user_memo??'')}</textarea><span class="memo-status muted" aria-live="polite"></span></td>
-   <td><span class="${vClass(verify)}">${E(verifyLabel(verify))}</span><br><span class="muted">신뢰도 ${conf} · 출처 ${E(c.source_grade||'-')}</span><br><span class="muted">검증 ${date(verifiedAt)}</span></td>
-   <td>${E(licenseDisplay(c.license_requirement))}<br><span class="muted">신입: ${c.entry_level_ok===true?'가능':c.entry_level_ok===false?'불가':'미확인'}</span></td>
-   <td>${E(c.location)}<br><span class="muted">${E(commute||'미확인')}</span><br><span class="muted">${E(c.nearest_station||'')}</span></td>
-   <td>${E(c.career_value||'미확인')}${present(c.expected_career_path)?`<span class="muted career-preview" title="${E(c.expected_career_path)}">${E(careerPreview(c.expected_career_path))}</span>`:''}</td>
-   <td><button class="view-button" data-company="${E(key)}" aria-controls="${E(panel)}" aria-expanded="${expanded.has(key)}" aria-label="${E(c.company_name)} 핵심 요약">${expanded.has(key)?'▼ 닫기':'▶ 보기'}</button></td>
-  </tr><tr class="summary-row" id="${E(panel)}" ${expanded.has(key)?'':'hidden'}><td colspan="8"><h3 class="summary-title">${E(c.company_name)} · 지원 결정 요약</h3><div class="summary-grid">${summaryCards(c)}</div><details class="analysis" data-analysis="${E(key)}" ${analyzed.has(key)?'open':''}><summary>상세 분석</summary><div class="analysis-grid">${analyzed.has(key)?analysisHTML(c):''}</div></details></td></tr>`}).join('')||'<tr><td colspan="8" class="muted">조건에 맞는 회사가 없습니다.</td></tr>';
- rows.querySelectorAll('[data-company]').forEach(button=>button.onclick=()=>{
-  const key=button.dataset.company,open=!expanded.has(key);open?expanded.add(key):expanded.delete(key);
-  document.getElementById(button.getAttribute('aria-controls')).hidden=!open;button.setAttribute('aria-expanded',String(open));button.textContent=open?'▼ 닫기':'▶ 보기';
- });
- rows.querySelectorAll('[data-memo-company]').forEach(textarea=>{
-  textarea.onchange=()=>saveMemo(textarea);textarea.onblur=()=>saveMemo(textarea);
- });
- rows.querySelectorAll('[data-analysis]').forEach(details=>details.ontoggle=()=>{
-  const key=details.dataset.analysis;
-  if(details.open){analyzed.add(key);const c=companies.find(c=>String(c.id)===key);if(c)details.querySelector('.analysis-grid').innerHTML=analysisHTML(c)}else analyzed.delete(key);
- });
- mAll.textContent=companies.filter(c=>!['제외','마감'].includes(c.status)).length;
- mTop.textContent=companies.filter(c=>!['제외','마감'].includes(c.status)&&c.recommendation_score>=70).length;
- mApply.textContent=companies.filter(c=>['지원예정','지원완료'].includes(c.status)).length;
- mVerify.textContent=companies.filter(c=>c.status!=='마감'&&!['통과','검증완료','독립검증 통과'].includes(c.verification_status||'')).length;
-}
-function renderLogs(){
- logs.innerHTML=activity.length?activity.map(x=>`<div class="log"><b>${E(x.action)}</b><div class="muted">${new Date(x.created_at).toLocaleString('ko-KR')} · ${E(x.detail||'')}</div></div>`).join(''):'<div class="muted">아직 업데이트 기록이 없습니다.</div>';
-}
-q.oninput=render;statusFilter.onchange=render;tierFilter.onchange=render;refresh.onclick=load;load();setInterval(load,60000);
+const H={apikey:KEY};let rows=[];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const tier=n=>n>=90?'S':n>=80?'A':n>=70?'B':n>=60?'C':'D';
+const d=s=>{if(!s)return '';const x=new Date(s+'T00:00:00');return (x.getMonth()+1)+'/'+x.getDate()};
+const dt=s=>{if(!s)return '';const x=new Date(s);return (x.getMonth()+1)+'/'+x.getDate()+' '+String(x.getHours()).padStart(2,'0')+':'+String(x.getMinutes()).padStart(2,'0')};
+const stageClass=s=>/면접/.test(s)?'interview':/지원예정/.test(s)?'apply':/지원완료|서류열람/.test(s)?'wait':'hold';
+const groupOf=s=>/면접|지원완료|서류열람/.test(s)?'진행 중':/지원예정/.test(s)?'지원 예정':'후순위 / 보류';
+const today=()=>{const x=new Date();x.setHours(0,0,0,0);return x};
+function dueText(c){if(c.next_event_at)return '일정 '+dt(c.next_event_at);if(c.posting_deadline)return '마감 '+d(c.posting_deadline);return ''}
+function actionWhen(c){if(!c.next_action_due)return '';const x=new Date(c.next_action_due+'T00:00:00'),t=today();const diff=Math.round((x-t)/86400000);if(diff<0)return '기한 지남';if(diff===0)return '오늘';if(diff===1)return '내일';return d(c.next_action_due)+'까지'}
+function jobCard(c){const score=c.recommendation_score==null?'-':c.recommendation_score,t=c.recommendation_score==null?'-':tier(c.recommendation_score),deadline=dueText(c);return '<article class="job"><div class="job-top"><div class="company-wrap"><div class="company-name">'+esc(c.company_name)+'</div><div class="role">'+esc(c.job_title||'')+'</div></div><div class="score">'+esc(score)+' ('+esc(t)+')</div></div><div class="badges"><span class="badge '+stageClass(c.status)+'">'+esc(c.status)+'</span>'+(deadline?'<span class="badge">'+esc(deadline)+'</span>':'')+'</div><div class="next"><div class="k">다음 행동'+(c.next_action_due?' · '+esc(actionWhen(c)):'')+'</div><div class="v">'+esc(c.next_action||'대기')+'</div></div><div class="meta"><div class="meta-box"><div class="k">보상</div><div class="v">'+esc(c.compensation_note||'—')+'</div></div><div class="meta-box"><div class="k">영어</div><div class="v">'+esc(c.english_requirement||'—')+'</div></div><div class="meta-box"><div class="k">근무지</div><div class="v">'+esc(c.location||'—')+'</div></div></div>'+(c.quick_strengths?'<div class="line strength"><b>강점</b>'+esc(c.quick_strengths)+'</div>':'')+(c.quick_risks?'<div class="line risk"><b>주의</b>'+esc(c.quick_risks)+'</div>':'')+(c.expected_career_path?'<div class="line"><b>경력</b>'+esc(c.expected_career_path)+'</div>':'')+'<div class="links">'+(c.job_url?'<a href="'+esc(c.job_url)+'" target="_blank" rel="noopener noreferrer">공고</a>':'')+'</div><div class="memo"><label>내 메모</label><textarea data-id="'+esc(c.id)+'" aria-label="'+esc(c.company_name)+' 내 메모"></textarea><div class="memo-status" aria-live="polite"></div></div></article>'}
+function renderTasks(){const list=rows.filter(c=>c.next_action&&!/회신 대기|연락 대기/.test(c.next_action)).sort((a,b)=>(a.next_action_due||'9999').localeCompare(b.next_action_due||'9999')||(a.priority_rank||99)-(b.priority_rank||99)).slice(0,6);tasks.innerHTML=list.length?list.map(c=>'<div class="task"><div><div class="company">'+esc(c.company_name)+'</div><div class="action">'+esc(c.next_action)+'</div></div><div class="when">'+esc(actionWhen(c)||dueText(c))+'</div>'+(c.job_url?'<a href="'+esc(c.job_url)+'" target="_blank" rel="noopener noreferrer">공고 보기</a>':'')+'</div>').join(''):'<div class="empty">지금 처리할 일이 없습니다.</div>'}
+function renderGroups(){const names=['진행 중','지원 예정','후순위 / 보류'];groups.innerHTML=names.map(name=>{const list=rows.filter(c=>groupOf(c.status)===name).sort((a,b)=>(a.priority_rank||99)-(b.priority_rank||99));if(!list.length)return '';return '<div class="group"><h3>'+name+'</h3><div class="cards">'+list.map(jobCard).join('')+'</div></div>'}).join('');document.querySelectorAll('textarea[data-id]').forEach(el=>{const c=rows.find(x=>String(x.id)===el.dataset.id);el.value=c?.user_memo||'';el.addEventListener('change',()=>saveMemo(el));el.addEventListener('blur',()=>saveMemo(el))})}
+function renderStats(){sProgress.textContent=rows.filter(c=>/지원완료|서류열람|면접/.test(c.status)).length;sPlan.textContent=rows.filter(c=>c.status==='지원예정').length;sInterview.textContent=rows.filter(c=>/면접/.test(c.status)).length;sWait.textContent=rows.filter(c=>/후순위|보류/.test(c.status)).length}
+async function saveMemo(el){const box=el.parentElement.querySelector('.memo-status');box.textContent='저장 중…';const r=await fetch(BASE+'companies?id=eq.'+encodeURIComponent(el.dataset.id),{method:'PATCH',headers:{...H,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({user_memo:el.value})});if(r.ok){const c=rows.find(x=>String(x.id)===el.dataset.id);if(c)c.user_memo=el.value;box.textContent='저장됨'}else box.textContent='저장 실패'}
+async function load(){sync.textContent='DB 동기화 중…';try{const r=await fetch(BASE+'companies?board_active=eq.true&select=*&order=priority_rank.asc.nullslast',{headers:H});if(!r.ok)throw Error('HTTP '+r.status);rows=await r.json();renderStats();renderTasks();renderGroups();sync.textContent='● Supabase 연결 · '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}catch(e){sync.textContent='DB 연결 오류 · '+e.message}}
+refresh.addEventListener('click',load);load();
 </script>
 </body></html>
